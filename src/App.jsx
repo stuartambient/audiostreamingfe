@@ -40,7 +40,6 @@ function App() {
   };
 
   const reducer = (state, action) => {
-    console.log(action.type, action);
     switch (action.type) {
       case "library": {
         return { ...state, library: !state.library };
@@ -58,6 +57,7 @@ function App() {
       case "newtrack": {
         return {
           ...state,
+          pause: action.pause,
           newtrack: action.newtrack,
           artist: action.artist,
           title: action.title,
@@ -79,6 +79,29 @@ function App() {
           currentTime: action.currentTime,
         };
       }
+      case "set-next-track": {
+        return {
+          ...state,
+          nextTrack: action.nextTrack,
+        };
+      }
+
+      case "set-prev-track": {
+        return {
+          ...state,
+          prevTrack: action.prevTrack,
+        };
+      }
+      case "filesPageNumber":
+        return {
+          ...state,
+          filesPageNumber: state.filesPageNumber + 1,
+        };
+      case "albumsPageNumber":
+        return {
+          ...state,
+          filesPageNumber: state.albumsPageNumber + 1,
+        };
       default:
         return;
     }
@@ -185,6 +208,7 @@ function App() {
 
     dispatch({
       type: "newtrack",
+      pause: false,
       newtrack: +e.target.getAttribute("val"),
       artist,
       title,
@@ -321,7 +345,13 @@ function App() {
           currentTrack={state.newtrack}
           playNext={state.playNext}
           playPrev={state.playPrev}
+          nextTrack={state.nextTrack}
+          prevTrack={state.prevTrack}
           active={state.active}
+          filesPageNumber={state.filesPageNumber}
+          albumsPageNumber={state.albumsPageNumber}
+          dispatch={dispatch}
+          handlePicture={handlePicture}
           /* setCurrentTrack={setCurrentTrack} */
         />
       ) : null}

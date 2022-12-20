@@ -13,12 +13,16 @@ const InfiniteList = ({
   setCurrentTrack,
   playNext,
   playPrev,
+  nextTrack,
+  prevTrack,
   active,
+  dispatch,
+  filesPageNumber,
+  albumsPageNumber,
+  handlePicture,
 }) => {
-  const [nextTrack, setNextTrack] = useState(undefined);
-  const [prevTrack, setPrevTrack] = useState();
-  const [filesPageNumber, setFilesPageNumber] = useState(0);
-  const [albumsPageNumber, setAlbumsPageNumber] = useState(0);
+  /*   const [filesPageNumber, setFilesPageNumber] = useState(0);
+  const [albumsPageNumber, setAlbumsPageNumber] = useState(0); */
   const [type, setType] = useState("files");
   const [searchTermFiles, setSearchTermFiles] = useState("");
   const [searchTermAlbums, setSearchTermFAlbums] = useState("");
@@ -36,9 +40,9 @@ const InfiniteList = ({
 
   const albumTracks = tracks.map(track => {
     if (track.title) {
-      return <li>{track.title}</li>;
+      return <li key={track.afid}>{track.title}</li>;
     } else {
-      <li>{track.audioFile}</li>;
+      <li key={track.afid}>{track.audioFile}</li>;
     }
   });
 
@@ -48,30 +52,57 @@ const InfiniteList = ({
   useEffect(() => {
     if (!files[currentTrack + 1]) return;
     if (currentTrack >= 0 && files) {
-      setNextTrack(files[currentTrack + 1].afid);
+      /* setNextTrack(files[currentTrack + 1].afid); */
+      dispatch({
+        type: "set-next-track",
+        nextTrack: files[currentTrack + 1].afid,
+      });
     }
 
     if (currentTrack >= 1) {
-      setPrevTrack(files[currentTrack - 1].afid);
+      /* setPrevTrack(files[currentTrack - 1].afid); */
+      dispatch({
+        type: "set-prev-track",
+        prevTrack: files[currentTrack - 1].afid,
+      });
     }
-  }, [currentTrack, files]);
+  }, [currentTrack, files, dispatch]);
+
+  /*   const handleTrackChange = trackId => {
+    const track = files.filter((i, index) => i.afid === trackId);
+    const changeTrack = new Event("click", {
+      bubbles: true,
+      cancelable: false,
+    });
+
+    const toTrack = document.getElementById(trackId);
+    toTrack.dispatchEvent(changeTrack);
+  }; */
 
   useEffect(() => {
+    const handleTrackChange = trackId => {
+      const changeTrack = new Event("click", {
+        bubbles: true,
+        cancelable: false,
+      });
+
+      const toTrack = document.getElementById(trackId);
+      toTrack.dispatchEvent(changeTrack);
+    };
+
     if (playNext && nextTrack) {
-      console.log("next");
       handleTrackChange(nextTrack);
     }
     if (playPrev && prevTrack) {
-      console.log("prev");
       handleTrackChange(prevTrack);
     }
-  }, [playNext, nextTrack, playPrev, prevTrack]);
+  }, [playNext, nextTrack, playPrev, prevTrack, files]);
 
-  const handleStateChange = () => {
+  /*  const handleStateChange = () => {
     setCurrentTrack(undefined);
     setNextTrack(undefined);
     setPrevTrack(undefined);
-  };
+  }; */
 
   const handleTextSearch = e => {
     /* setTextSearch(e.target.value); */
@@ -88,16 +119,6 @@ const InfiniteList = ({
     }
   };
 
-  const handleTrackChange = trackId => {
-    console.log("trackId: ", trackId);
-    const changeTrack = new Event("click", {
-      bubbles: true,
-      cancelable: false,
-    });
-
-    const toTrack = document.getElementById(trackId);
-    toTrack.dispatchEvent(changeTrack);
-  };
   /* Cannot update a component (`App`) while rendering a different component (`InfiniteList`). */
 
   const handleListScroll = e => {
@@ -146,7 +167,10 @@ const InfiniteList = ({
         entries => {
           if (entries[0].isIntersecting && hasMoreFiles) {
             /* console.log('entries: ', entries[0].isIntersecting, hasMore); */
-            setFilesPageNumber(prevPageNumber => prevPageNumber + 1);
+            /* setFilesPageNumber(prevPageNumber => prevPageNumber + 1); */
+            dispatch({
+              type: "filesPageNumber",
+            });
           }
         },
         {
@@ -157,7 +181,7 @@ const InfiniteList = ({
       );
       if (node) filesObserver.current.observe(node);
     },
-    [filesLoading, hasMoreFiles]
+    [filesLoading, hasMoreFiles, dispatch]
   );
 
   const lastAlbumElement = useCallback(
@@ -168,7 +192,10 @@ const InfiniteList = ({
         entries => {
           if (entries[0].isIntersecting && hasMoreAlbums) {
             /* console.log('entries: ', entries[0].isIntersecting, hasMore); */
-            setAlbumsPageNumber(prevPageNumber => prevPageNumber + 1);
+            /*  setAlbumsPageNumber(prevPageNumber => prevPageNumber + 1); */
+            dispatch({
+              type: "albumsPageNumber",
+            });
           }
         },
         {
@@ -179,7 +206,7 @@ const InfiniteList = ({
       );
       if (node) albumsObserver.current.observe(node);
     },
-    [albumsLoading, hasMoreAlbums]
+    [albumsLoading, hasMoreAlbums, dispatch]
   );
 
   const scrollToView = useCallback(
@@ -303,7 +330,21 @@ const InfiniteList = ({
         {type === "albums" && !albums.length && !albumsLoading ? (
           <div className="noresults">No results</div>
         ) : null}
-        {type === "files" ? byFiles : byAlbums}
+        {type === "files" ? (
+          <>
+            <div className="files">{byFiles}</div>
+            <div className="albums" style={{ display: "none" }}>
+              {byAlbums}
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="albums">{byAlbums}</div>
+            <div className="files" style={{ display: "none" }}>
+              {byFiles}
+            </div>
+          </>
+        )}
         {type === "files"
           ? filesLoading && <div className="item itemloading">...Loading</div>
           : null}

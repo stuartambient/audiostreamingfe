@@ -17,10 +17,12 @@ const useFiles = (filesPageNumber, searchTermFiles) => {
     /* let ignore = false; */
     setFilesLoading(true);
     setFilesError(false);
+    let cancel;
     axios({
       method: "GET",
       url: "http://localhost:3008/allfiles/",
       params: { page: filesPageNumber, text: searchTermFiles },
+      cancelToken: new axios.CancelToken(c => (cancel = c)),
     })
       .then(res => {
         setFiles(prevFiles => {
@@ -32,6 +34,7 @@ const useFiles = (filesPageNumber, searchTermFiles) => {
       .catch(e => {
         setFilesError(true);
       });
+    return () => cancel();
   }, [filesPageNumber, searchTermFiles]);
 
   return { filesLoading, files, setFiles, hasMoreFiles, filesError };
@@ -48,10 +51,12 @@ const useAlbums = (albumsPageNumber, searchTermAlbums) => {
     /* let ignore = false; */
     setAlbumsLoading(true);
     setAlbumsError(false);
+    let cancel;
     axios({
       method: "GET",
       url: "http://localhost:3008/allalbums/",
       params: { page: albumsPageNumber, text: searchTermAlbums },
+      cancelToken: new axios.CancelToken(c => (cancel = c)),
     })
       .then(res => {
         setAlbums(prevItems => {
@@ -63,6 +68,7 @@ const useAlbums = (albumsPageNumber, searchTermAlbums) => {
       .catch(e => {
         setAlbumsError(true);
       });
+    return () => cancel();
   }, [albumsPageNumber, searchTermAlbums]);
 
   return { albumsLoading, albums, setAlbums, hasMoreAlbums, albumsError };
