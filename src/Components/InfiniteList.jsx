@@ -17,12 +17,10 @@ const InfiniteList = ({
   prevTrack,
   active,
   dispatch,
-  filesPageNumber,
-  albumsPageNumber,
   handlePicture,
 }) => {
-  /*   const [filesPageNumber, setFilesPageNumber] = useState(0);
-  const [albumsPageNumber, setAlbumsPageNumber] = useState(0); */
+  const [filesPageNumber, setFilesPageNumber] = useState(0);
+  const [albumsPageNumber, setAlbumsPageNumber] = useState(0);
   const [type, setType] = useState("files");
   const [searchTermFiles, setSearchTermFiles] = useState("");
   const [searchTermAlbums, setSearchTermFAlbums] = useState("");
@@ -111,10 +109,11 @@ const InfiniteList = ({
 
     if (type === "files") {
       setSearchTermFiles(e.currentTarget.textsearch.value);
+      setFilesPageNumber(0);
       setFiles([]);
-      /* handleStateChange(); */
     } else {
       setSearchTermFAlbums(e.currentTarget.textsearch.value);
+      setAlbumsPageNumber(0);
       setAlbums([]);
     }
   };
@@ -162,15 +161,16 @@ const InfiniteList = ({
   const lastFileElement = useCallback(
     node => {
       if (filesLoading) return;
+      /*  if (!hasMoreFiles) return setSearchTermFiles(""); */
       if (filesObserver.current) filesObserver.current.disconnect();
       filesObserver.current = new IntersectionObserver(
         entries => {
           if (entries[0].isIntersecting && hasMoreFiles) {
             /* console.log('entries: ', entries[0].isIntersecting, hasMore); */
-            /* setFilesPageNumber(prevPageNumber => prevPageNumber + 1); */
-            dispatch({
+            setFilesPageNumber(prevPageNumber => prevPageNumber + 1);
+            /*    dispatch({
               type: "filesPageNumber",
-            });
+            }); */
           }
         },
         {
@@ -181,7 +181,7 @@ const InfiniteList = ({
       );
       if (node) filesObserver.current.observe(node);
     },
-    [filesLoading, hasMoreFiles, dispatch]
+    [filesLoading, hasMoreFiles]
   );
 
   const lastAlbumElement = useCallback(
@@ -192,10 +192,10 @@ const InfiniteList = ({
         entries => {
           if (entries[0].isIntersecting && hasMoreAlbums) {
             /* console.log('entries: ', entries[0].isIntersecting, hasMore); */
-            /*  setAlbumsPageNumber(prevPageNumber => prevPageNumber + 1); */
-            dispatch({
+            setAlbumsPageNumber(prevPageNumber => prevPageNumber + 1);
+            /*  dispatch({
               type: "albumsPageNumber",
-            });
+            }); */
           }
         },
         {
@@ -206,7 +206,7 @@ const InfiniteList = ({
       );
       if (node) albumsObserver.current.observe(node);
     },
-    [albumsLoading, hasMoreAlbums, dispatch]
+    [albumsLoading, hasMoreAlbums]
   );
 
   const scrollToView = useCallback(

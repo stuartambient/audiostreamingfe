@@ -92,16 +92,6 @@ function App() {
           prevTrack: action.prevTrack,
         };
       }
-      case "filesPageNumber":
-        return {
-          ...state,
-          filesPageNumber: state.filesPageNumber + 1,
-        };
-      case "albumsPageNumber":
-        return {
-          ...state,
-          filesPageNumber: state.albumsPageNumber + 1,
-        };
       default:
         return;
     }
@@ -348,8 +338,6 @@ function App() {
           nextTrack={state.nextTrack}
           prevTrack={state.prevTrack}
           active={state.active}
-          filesPageNumber={state.filesPageNumber}
-          albumsPageNumber={state.albumsPageNumber}
           dispatch={dispatch}
           handlePicture={handlePicture}
           /* setCurrentTrack={setCurrentTrack} */
