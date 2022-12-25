@@ -48,8 +48,9 @@ const InfiniteList = ({
   const searchRef = useRef();
 
   useEffect(() => {
-    if (!files[currentTrack + 1]) return;
-    if (currentTrack >= 0 && files) {
+    /* if (!files[currentTrack + 1]) return; */
+
+    if (currentTrack >= 0 && files[currentTrack + 1]) {
       /* setNextTrack(files[currentTrack + 1].afid); */
       dispatch({
         type: "set-next-track",
@@ -59,6 +60,8 @@ const InfiniteList = ({
 
     if (currentTrack >= 1) {
       /* setPrevTrack(files[currentTrack - 1].afid); */
+      console.log("ct: ", files[currentTrack - 1]);
+
       dispatch({
         type: "set-prev-track",
         prevTrack: files[currentTrack - 1].afid,
@@ -214,7 +217,7 @@ const InfiniteList = ({
       if (!node) return;
       if (active && node && node.getAttribute("id") === `${active}--item-div`) {
         scrollRef.current = node;
-        scrollRef.current.scrollIntoView();
+        /* scrollRef.current.scrollIntoView(); */
       }
       /*       if (active) {
         console.log(activeRef);

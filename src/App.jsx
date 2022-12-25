@@ -64,6 +64,8 @@ function App() {
           album: action.album,
           cover: action.cover,
           active: action.active,
+          nextTrack: action.nextTrack,
+          prevTrack: action.prevTrack,
         };
       }
       case "duration": {
@@ -205,6 +207,8 @@ function App() {
       album,
       cover: handlePicture(picture),
       active: e.target.id,
+      nextTrack: "",
+      prevTrack: "",
     });
 
     dispatch({
